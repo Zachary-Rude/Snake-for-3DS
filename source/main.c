@@ -26,7 +26,7 @@ struct Food
 
 struct Snake
 {
-	int lenght;
+	int length;
 	u32 color;
 	struct Vector2 positions[1000];
 	struct Vector2 headPositon;
@@ -68,50 +68,6 @@ void checkCollision();
 void saveHighscore();
 void loadHighscore();
 
-int main(int argc, char* argv[]) {
-	gfxInitDefault();
-	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
-	C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
-	C2D_Prepare();
-	initGame();
-	initSnake();
-	spawnFood();
-
-	game.top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
-	game.bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
-
-	game.dynamicBuf = C2D_TextBufNew(4096);
-
-	while (aptMainLoop())
-	{
-		if(game.status == EXIT)
-			break;
-
-		if(game.status == GAME_OVER)
-		{
-			saveHighscore();
-			game.score = 0;
-			initSnake();
-			spawnFood();
-			game.status = RUNNING;
-		}
-
-		input();
-		drawTopScreen();
-		drawBottomScreen();
-		int wait = snake.speed;
-		while(wait--)
-		{
-			gspWaitForVBlank();
-		}
-	}
-
-	C2D_Fini();
-	C3D_Fini();
-	gfxExit();
-	return 0;
-}
-
 void drawTopScreen()
 {
 	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
@@ -137,7 +93,7 @@ void drawBottomScreen()
 	C2D_TextOptimize(&game.scoreText);
 	C2D_DrawText(&game.scoreText, C2D_AlignCenter | C2D_WithColor, 65, 0, 0, 1, 1, C2D_Color32(255, 255, 255, 255));
 
-	snprintf(buf, sizeof(buf), "High Score: %d", game.highscore);
+	snprintf(buf, sizeof(buf), "Highscore: %d", game.highscore);
 	C2D_TextParse(&game.scoreText, game.dynamicBuf, buf);
 	C2D_TextOptimize(&game.scoreText);
 	C2D_DrawText(&game.scoreText, C2D_AlignCenter | C2D_WithColor, 220, 0, 0, 1, 1, C2D_Color32(255, 255, 255, 255));
@@ -147,7 +103,7 @@ void drawBottomScreen()
 
 void initGame()
 {
-	loadHighscore();
+	game.highscore = 0;
 	game.clrClear = C2D_Color32(0, 0, 0, 1);
 	game.wallColor = C2D_Color32(0, 0, 0, 255);
 	game.score = 0;
@@ -192,7 +148,7 @@ void checkCollision()
 		game.status = GAME_OVER;
 	}
 
-	for(int i = 0; i < snake.lenght; i++)
+	for(int i = 0; i < snake.length; i++)
 	{
 		if(snake.headPositon.x == snake.positions[i].x && snake.headPositon.y == snake.positions[i].y)
 		{
@@ -221,7 +177,7 @@ int isFoodSpawnValid(int x, int y)
 		return 0;
 	}
 
-	for(int i = 0; i < snake.lenght; i++)
+	for(int i = 0; i < snake.length; i++)
 	{
 		l2.x = snake.positions[i].x - 20;
 		l2.y = snake.positions[i].y + 20;
@@ -260,7 +216,7 @@ void drawFood()
 
 void initSnake()
 {
-	snake.lenght = 5;
+	snake.length = 5;
 	snake.headPositon.x = 200;
 	snake.headPositon.y = 120;
 	snake.color = C2D_Color32(0, 255, 0, 255);
@@ -268,7 +224,7 @@ void initSnake()
 	snake.dy = 0;
 	snake.speed = 6;
 
-	for(int i = 0; i < snake.lenght; i++)
+	for(int i = 0; i < snake.length; i++)
 	{
 		snake.positions[i].x = 190 - (i * 10);
 		snake.positions[i].y = 120;
@@ -279,7 +235,7 @@ void drawSnake()
 {
 	C2D_DrawRectSolid(snake.headPositon.x, snake.headPositon.y, 0, 10, 10, snake.color);
 
-	for(int i = 0; i < snake.lenght; i++)
+	for(int i = 0; i < snake.length; i++)
 	{
 		C2D_DrawRectSolid(snake.positions[i].x, snake.positions[i].y, 0, 10, 10, snake.color);
 	}
@@ -287,7 +243,7 @@ void drawSnake()
 
 void moveSnake()
 {
-	for(int i = snake.lenght - 1; i >= 0; i--)
+	for(int i = snake.length - 1; i >= 0; i--)
 	{
 		snake.positions[i].x = snake.positions[i - 1].x;
 		snake.positions[i].y = snake.positions[i - 1].y;
@@ -303,10 +259,6 @@ void input()
 {
 	hidScanInput();
 	u32 kDown = hidKeysDown();
-	if(kDown & KEY_START)
-	{
-		game.status = EXIT;
-	}
 	if(kDown & KEY_UP)
 	{
 		if(snake.dy != 10)
@@ -343,11 +295,15 @@ void input()
 
 void addScore()
 {
-	snake.positions[snake.lenght].x = snake.positions[snake.lenght - 1].x;
-	snake.positions[snake.lenght].y = snake.positions[snake.lenght - 1].y;
+	snake.positions[snake.length].x = snake.positions[snake.length - 1].x;
+	snake.positions[snake.length].y = snake.positions[snake.length - 1].y;
 
-	snake.lenght += 1;
+	snake.length += 1;
 	game.score += 1;
+	if(game.score > game.highscore)
+	{
+		game.highscore = game.score;
+	}
 	for(int i = 0; i < 4; i++)
 	{
 		if(game.score == 3 * (i + 1))
@@ -373,27 +329,51 @@ void saveHighscore()
 {
 	if(game.score > game.highscore)
 	{
-		FILE* file = fopen("snake/game.dat", "r+");
-		char buffer[16] = {};
-		sprintf(buffer, "%d", game.score);
-		fputs(buffer, file);
-		fclose(file);
 		game.highscore = game.score;
 	}
-
 }
 
-void loadHighscore()
-{
-	FILE* file = fopen("snake/game.dat", "r+");
-	if(file == NULL)
+
+int main(int argc, char* argv[]) {
+	gfxInitDefault();
+	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
+	C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
+	C2D_Prepare();
+	initGame();
+	initSnake();
+	spawnFood();
+
+	game.top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
+	game.bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+
+	game.dynamicBuf = C2D_TextBufNew(4096);
+
+	while (aptMainLoop())
 	{
-		mkdir("snake");
-		file = fopen("snake/game.dat", "w+");
-		char buffer[16] = {0};
-		sprintf(buffer, "%d", 0);
-		fputs(buffer, file);
+		if(game.status == EXIT)
+			break;
+
+		if(game.status == GAME_OVER)
+		{
+			saveHighscore();
+			game.score = 0;
+			initSnake();
+			spawnFood();
+			game.status = RUNNING;
+		}
+
+		input();
+		drawTopScreen();
+		drawBottomScreen();
+		int wait = snake.speed;
+		while(wait--)
+		{
+			gspWaitForVBlank();
+		}
 	}
-	fscanf(file, "%d", &game.highscore);
-	fclose(file);
+
+	C2D_Fini();
+	C3D_Fini();
+	gfxExit();
+	return 0;
 }

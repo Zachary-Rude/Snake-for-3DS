@@ -1,6 +1,6 @@
 BasicInfo:
   Title                   : "Snake"
-  ProductCode             : "CTR-S-SNAK" # You can make this whatever you want, it doesn't have to follow the Nintendo standard
+  ProductCode             : "CTR-P-SNAK" # You can make this whatever you want, it doesn't have to follow the Nintendo standard
   Logo                    : Licensed # Nintendo / Licensed / Distributed / iQue / iQueForSystem
 
 #RomFs:
@@ -9,7 +9,7 @@ BasicInfo:
 
 TitleInfo:
   Category                : Application
-  UniqueId                : 0xf51a8 #Something like 0x1337, but you can make it whatever you want, as long as it's a hexadecimal number (probably best to make it something actually unique though!)
+  UniqueId                : 0x42690 #Something like 0x1337, but you can make it whatever you want, as long as it's a hexadecimal number (probably best to make it something actually unique though!)
 
 Option:
   UseOnSD                 : true # true if App is to be installed to SD

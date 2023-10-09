@@ -1,5 +1,7 @@
 *.elf
 *.3dsx
+*.3ds
+*.cxi
 *.smdh
 romfs/
 build/
