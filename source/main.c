@@ -267,7 +267,23 @@ void input()
 			snake.dy = -10;
 		}
 	}
+	if(kDown & KEY_CPAD_UP)
+	{
+		if(snake.dy != 10)
+		{
+			snake.dx = 0;				
+			snake.dy = -10;
+		}
+	}
 	if(kDown & KEY_DOWN)
+	{
+		if(snake.dy != -10)
+		{
+			snake.dx = 0;
+			snake.dy = 10;
+		}
+	}
+	if(kDown & KEY_CPAD_DOWN)
 	{
 		if(snake.dy != -10)
 		{
@@ -283,7 +299,31 @@ void input()
 			snake.dy = 0;
 		}
 	}
+	if(kDown & KEY_RIGHT)
+	{
+		if(snake.dx != -10)
+		{
+			snake.dx = 10;
+			snake.dy = 0;
+		}
+	}
+	if(kDown & KEY_CPAD_RIGHT)
+	{
+		if(snake.dx != -10)
+		{
+			snake.dx = 10;
+			snake.dy = 0;
+		}
+	}
 	if(kDown & KEY_LEFT)
+	{
+		if(snake.dx != 10)
+		{
+			snake.dx = -10;
+			snake.dy = 0;
+		}
+	}	
+	if(kDown & KEY_CPAD_LEFT)
 	{
 		if(snake.dx != 10)
 		{
@@ -316,13 +356,13 @@ void addScore()
 void drawWalls()
 {
 	//left wall
-	C2D_DrawRectSolid(0, 0, 0, 20, SCREEN_HEIGHT, game.wallColor);
+	C2D_DrawRectSolid(0, 0, 0, 10, SCREEN_HEIGHT, game.wallColor);
 	//right wall
-	C2D_DrawRectSolid(SCREEN_WIDTH - 20, 0, 0, 20, SCREEN_HEIGHT, game.wallColor);
+	C2D_DrawRectSolid(SCREEN_WIDTH - 10, 0, 0, 10, SCREEN_HEIGHT, game.wallColor);
 	//upper wall
-	C2D_DrawRectSolid(20, SCREEN_HEIGHT - 20, 0, SCREEN_WIDTH - 40, 20, game.wallColor);
+	C2D_DrawRectSolid(20, SCREEN_HEIGHT - 10, 0, SCREEN_WIDTH - 20, 10, game.wallColor);
 	//lower wall
-	C2D_DrawRectSolid(20, 0, 0, SCREEN_WIDTH - 40, 20, game.wallColor);
+	C2D_DrawRectSolid(10, 0, 0, SCREEN_WIDTH - 20, 10, game.wallColor);
 }
 
 void saveHighscore()

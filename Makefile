@@ -32,14 +32,18 @@ include $(DEVKITARM)/3ds_rules
 #     - <libctru folder>/default_icon.png
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
-BUILD		:=	build
+BUILD		  :=	build
 SOURCES		:=	source
-DATA		:=	data
+DATA		  :=	data
 INCLUDES	:=	include
 GRAPHICS	:=	gfx
 #GFXBUILD	:=	$(BUILD)
-ROMFS		:=	romfs
+ROMFS		  :=	romfs
 GFXBUILD	:=	$(ROMFS)/gfx
+
+APP_TITLE :=  Snake for 3DS
+APP_DESCRIPTION := Snake for 3DS is a simple snake game for the Nintendo 3DS console, with some extra features.
+APP_AUTHOR := Zachary Rude
 
 #---------------------------------------------------------------------------------
 # options for code generation
