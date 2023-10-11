@@ -12,6 +12,7 @@
 #define GAME_OVER 0
 #define RUNNING 1
 #define EXIT 2
+#define PAUSED 3
 
 struct Vector2
 {
@@ -47,6 +48,7 @@ struct Game
 	C3D_RenderTarget* bottom;
 	C2D_TextBuf dynamicBuf;
 	C2D_Text scoreText[4];
+	C2D_Text pausedText[4];
 };
 
 struct Game game;
@@ -66,7 +68,6 @@ void spawnFood();
 void drawFood();
 void checkCollision();
 void saveHighscore();
-void loadHighscore();
 
 void drawTopScreen()
 {
@@ -78,6 +79,13 @@ void drawTopScreen()
 	drawWalls();
 	drawSnake();
 	drawFood();
+	if (game.status == PAUSED) {
+	  char buf[160];
+	  snprintf(buf, sizeof(buf), "Paused", game.score);
+	  C2D_TextParse(&game.scoreText, game.dynamicBuf, buf);
+	  C2D_TextOptimize(&game.scoreText);
+	  C2D_DrawText(&game.scoreText, C2D_AlignCenter | C2D_WithColor, 0, 0, 10, 1, 1, C2D_Color32(255, 255, 255, 255));
+	}
 	C3D_FrameEnd(0);
 }
 
@@ -96,7 +104,7 @@ void drawBottomScreen()
 	snprintf(buf, sizeof(buf), "Highscore: %d", game.highscore);
 	C2D_TextParse(&game.scoreText, game.dynamicBuf, buf);
 	C2D_TextOptimize(&game.scoreText);
-	C2D_DrawText(&game.scoreText, C2D_AlignCenter | C2D_WithColor, 220, 0, 0, 1, 1, C2D_Color32(255, 255, 255, 255));
+	C2D_DrawText(&game.scoreText, C2D_AlignCenter | C2D_WithColor, 65, -65, 0, 1, 1, C2D_Color32(255, 255, 255, 255));
 
 	C3D_FrameEnd(0);
 }
@@ -246,14 +254,16 @@ void moveSnake()
 	for(int i = snake.length - 1; i >= 0; i--)
 	{
 		snake.positions[i].x = snake.positions[i - 1].x;
-		snake.positions[i].y = snake.positions[i - 1].y;
-	}
+	  snake.positions[i].y = snake.positions[i - 1].y;
+  }	  
 	snake.positions[0].x = snake.headPositon.x;
 	snake.positions[0].y = snake.headPositon.y;
+	if(game.status == RUNNING)
+	{
 
-	snake.headPositon.x += snake.dx;
-	snake.headPositon.y += snake.dy;
-
+	  snake.headPositon.x += snake.dx;
+	  snake.headPositon.y += snake.dy;
+	}
 }
 void input()
 {
@@ -261,7 +271,7 @@ void input()
 	u32 kDown = hidKeysDown();
 	if(kDown & KEY_UP)
 	{
-		if(snake.dy != 10)
+		if(snake.dy != 10 && game.status == RUNNING)
 		{
 			snake.dx = 0;				
 			snake.dy = -10;
@@ -269,7 +279,7 @@ void input()
 	}
 	if(kDown & KEY_CPAD_UP)
 	{
-		if(snake.dy != 10)
+		if(snake.dy != 10 && game.status == RUNNING)
 		{
 			snake.dx = 0;				
 			snake.dy = -10;
@@ -277,7 +287,7 @@ void input()
 	}
 	if(kDown & KEY_DOWN)
 	{
-		if(snake.dy != -10)
+		if(snake.dy != -10 && game.status == RUNNING)
 		{
 			snake.dx = 0;
 			snake.dy = 10;
@@ -285,7 +295,7 @@ void input()
 	}
 	if(kDown & KEY_CPAD_DOWN)
 	{
-		if(snake.dy != -10)
+		if(snake.dy != -10 && game.status == RUNNING)
 		{
 			snake.dx = 0;
 			snake.dy = 10;
@@ -293,7 +303,7 @@ void input()
 	}
 	if(kDown & KEY_RIGHT)
 	{
-		if(snake.dx != -10)
+		if(snake.dx != -10 && game.status == RUNNING)
 		{
 			snake.dx = 10;
 			snake.dy = 0;
@@ -301,13 +311,13 @@ void input()
 	}
 	if(kDown & KEY_RIGHT)
 	{
-		if(snake.dx != -10)
+		if(snake.dx != -10 && game.status == RUNNING)
 		{
 			snake.dx = 10;
 			snake.dy = 0;
 		}
 	}
-	if(kDown & KEY_CPAD_RIGHT)
+	if(kDown & KEY_CPAD_RIGHT && game.status == RUNNING)
 	{
 		if(snake.dx != -10)
 		{
@@ -315,7 +325,7 @@ void input()
 			snake.dy = 0;
 		}
 	}
-	if(kDown & KEY_LEFT)
+	if(kDown & KEY_LEFT && game.status == RUNNING)
 	{
 		if(snake.dx != 10)
 		{
@@ -323,14 +333,26 @@ void input()
 			snake.dy = 0;
 		}
 	}	
-	if(kDown & KEY_CPAD_LEFT)
+	if(kDown & KEY_CPAD_LEFT && game.status == RUNNING)
 	{
-		if(snake.dx != 10)
+		if(snake.dx != 10 && game.status == RUNNING)
 		{
 			snake.dx = -10;
 			snake.dy = 0;
 		}
-	}	
+	}
+	if(kDown & KEY_START)
+	{
+		if (game.status == RUNNING)
+		{
+			game.status = PAUSED;
+		}
+		else if (game.status == PAUSED)
+		{
+			game.status == RUNNING;
+		}
+		
+	}
 }
 
 void addScore()
