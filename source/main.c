@@ -81,10 +81,10 @@ void drawTopScreen()
 	drawFood();
 	if (game.status == PAUSED) {
 	  char buf[160];
-	  snprintf(buf, sizeof(buf), "Paused", game.score);
-	  C2D_TextParse(&game.scoreText, game.dynamicBuf, buf);
-	  C2D_TextOptimize(&game.scoreText);
-	  C2D_DrawText(&game.scoreText, C2D_AlignCenter | C2D_WithColor, 0, 0, 10, 1, 1, C2D_Color32(255, 255, 255, 255));
+	  snprintf(buf, sizeof(buf), "Paused");
+	  C2D_TextParse(&game.pausedText, game.dynamicBuf, buf);
+	  C2D_TextOptimize(&game.pausedText);
+	  C2D_DrawText(&game.pausedText, C2D_AlignCenter | C2D_WithColor, 0, 0, 10, 1, 1, C2D_Color32(255, 255, 255, 255));
 	}
 	C3D_FrameEnd(0);
 }
@@ -104,7 +104,7 @@ void drawBottomScreen()
 	snprintf(buf, sizeof(buf), "Highscore: %d", game.highscore);
 	C2D_TextParse(&game.scoreText, game.dynamicBuf, buf);
 	C2D_TextOptimize(&game.scoreText);
-	C2D_DrawText(&game.scoreText, C2D_AlignCenter | C2D_WithColor, 65, -65, 0, 1, 1, C2D_Color32(255, 255, 255, 255));
+	C2D_DrawText(&game.scoreText, C2D_AlignCenter | C2D_WithColor, 65, 33, 0, 1, 1, C2D_Color32(255, 255, 255, 255));
 
 	C3D_FrameEnd(0);
 }
@@ -251,16 +251,15 @@ void drawSnake()
 
 void moveSnake()
 {
-	for(int i = snake.length - 1; i >= 0; i--)
-	{
-		snake.positions[i].x = snake.positions[i - 1].x;
-	  snake.positions[i].y = snake.positions[i - 1].y;
-  }	  
-	snake.positions[0].x = snake.headPositon.x;
-	snake.positions[0].y = snake.headPositon.y;
 	if(game.status == RUNNING)
 	{
-
+	  for(int i = snake.length - 1; i >= 0; i--)
+	  {
+		  snake.positions[i].x = snake.positions[i - 1].x;
+	    snake.positions[i].y = snake.positions[i - 1].y;
+    }	  
+	  snake.positions[0].x = snake.headPositon.x;
+	  snake.positions[0].y = snake.headPositon.y;
 	  snake.headPositon.x += snake.dx;
 	  snake.headPositon.y += snake.dy;
 	}
@@ -341,7 +340,7 @@ void input()
 			snake.dy = 0;
 		}
 	}
-	if(kDown & KEY_START)
+	if(hidKeysUp() & KEY_START)
 	{
 		if (game.status == RUNNING)
 		{
