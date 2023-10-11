@@ -99,12 +99,12 @@ void drawBottomScreen()
 	snprintf(buf, sizeof(buf), "Score: %d", game.score);
 	C2D_TextParse(&game.scoreText, game.dynamicBuf, buf);
 	C2D_TextOptimize(&game.scoreText);
-	C2D_DrawText(&game.scoreText, C2D_AlignCenter | C2D_WithColor, 65, 0, 0, 1, 1, C2D_Color32(255, 255, 255, 255));
+	C2D_DrawText(&game.scoreText, C2D_AlignLeft | C2D_WithColor, 10, 0, 0, 1, 1, C2D_Color32(255, 255, 255, 255));
 
 	snprintf(buf, sizeof(buf), "Highscore: %d", game.highscore);
 	C2D_TextParse(&game.scoreText, game.dynamicBuf, buf);
 	C2D_TextOptimize(&game.scoreText);
-	C2D_DrawText(&game.scoreText, C2D_AlignLeft | C2D_WithColor, 0, 33, 0, 1, 1, C2D_Color32(255, 255, 255, 255));
+	C2D_DrawText(&game.scoreText, C2D_AlignLeft | C2D_WithColor, 10, 33, 0, 1, 1, C2D_Color32(255, 255, 255, 255));
 
 	C3D_FrameEnd(0);
 }
