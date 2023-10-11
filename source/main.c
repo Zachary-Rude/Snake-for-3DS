@@ -47,8 +47,10 @@ struct Game
 	C3D_RenderTarget* top;
 	C3D_RenderTarget* bottom;
 	C2D_TextBuf dynamicBuf;
+	C2D_TextBuf staticBuf;
 	C2D_Text scoreText[4];
 	C2D_Text pausedText[4];
+  char pauseBuf[160];
 };
 
 struct Game game;
@@ -79,12 +81,10 @@ void drawTopScreen()
 	drawWalls();
 	drawSnake();
 	drawFood();
+	C2D_TextParse(&game.pausedText, game.staticBuf, "Paused");
+	C2D_TextOptimize(&game.pausedText);
 	if (game.status == PAUSED) {
-	  char buf[160];
-	  snprintf(buf, sizeof(buf), "Paused");
-	  C2D_TextParse(&game.pausedText, game.dynamicBuf, buf);
-	  C2D_TextOptimize(&game.pausedText);
-	  C2D_DrawText(&game.pausedText, C2D_AlignCenter | C2D_WithColor, 0, 0, 10, 1, 1, C2D_Color32(255, 255, 255, 255));
+	  C2D_DrawText(&game.pausedText, C2D_AlignCenter | C2D_WithColor, 200, 120, 1, 2, 2, C2D_Color32(255, 255, 255, 255));
 	}
 	C3D_FrameEnd(0);
 }
@@ -111,6 +111,7 @@ void drawBottomScreen()
 
 void initGame()
 {
+	game.staticBuf = C2D_TextBufNew(4096);
 	game.highscore = 0;
 	game.clrClear = C2D_Color32(0, 0, 0, 1);
 	game.wallColor = C2D_Color32(0, 0, 0, 255);
@@ -147,11 +148,11 @@ void checkCollision()
 		spawnFood();
 	}
 
-	if(snake.headPositon.x == 20 || snake.headPositon.x == SCREEN_WIDTH - 20)
+	if(snake.headPositon.x == 10 || snake.headPositon.x == SCREEN_WIDTH - 10)
 	{
 		game.status = GAME_OVER;
 	}
-	if(snake.headPositon.y == 20 || snake.headPositon.y == SCREEN_HEIGHT - 20)
+	if(snake.headPositon.y == 10 || snake.headPositon.y == SCREEN_HEIGHT - 10)
 	{
 		game.status = GAME_OVER;
 	}
@@ -187,11 +188,11 @@ int isFoodSpawnValid(int x, int y)
 
 	for(int i = 0; i < snake.length; i++)
 	{
-		l2.x = snake.positions[i].x - 20;
-		l2.y = snake.positions[i].y + 20;
+		l2.x = snake.positions[i].x - 10;
+		l2.y = snake.positions[i].y + 10;
 		struct Vector2 r2;
-		r2.x = snake.positions[i].x + 20;
-		r2.y = snake.positions[i].y - 20;
+		r2.x = snake.positions[i].x + 10;
+		r2.y = snake.positions[i].y - 10;
 		if(isOverlapping(l1, r1, l2, r2))
 		{
 			return 0;
@@ -350,7 +351,13 @@ void input()
 		{
 			game.status = RUNNING;
 		}
-		
+	}
+	if(hidKeysUp() & KEY_B)
+	{
+		if (game.status == PAUSED)
+		{
+			game.status = RUNNING;
+		}
 	}
 }
 
