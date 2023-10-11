@@ -349,7 +349,7 @@ void input()
 		}
 		else if (game.status == PAUSED)
 		{
-			game.status == RUNNING;
+			game.status = RUNNING;
 		}
 		
 	}
