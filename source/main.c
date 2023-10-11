@@ -50,7 +50,7 @@ struct Game
 	C2D_TextBuf staticBuf;
 	C2D_Text scoreText[4];
 	C2D_Text pausedText[4];
-  char pauseBuf[160];
+	C2D_Text gameOverText[4];
 };
 
 struct Game game;
@@ -83,8 +83,14 @@ void drawTopScreen()
 	drawFood();
 	C2D_TextParse(&game.pausedText, game.staticBuf, "Paused");
 	C2D_TextOptimize(&game.pausedText);
-	if (game.status == PAUSED) {
+	C2D_TextParse(&game.gameOverText, game.staticBuf, "Game Over");
+	C2D_TextOptimize(&game.gameOverText);
+	if (game.status == PAUSED)
+	{
 	  C2D_DrawText(&game.pausedText, C2D_AlignCenter | C2D_WithColor, 200, 120, 1, 2, 2, C2D_Color32(255, 255, 255, 255));
+	}
+	else if (game.status == GAME_OVER) {
+	  C2D_DrawText(&game.gameOverText, C2D_AlignCenter | C2D_WithColor, 200, 120, 1, 2, 2, C2D_Color32(255, 255, 255, 255));
 	}
 	C3D_FrameEnd(0);
 }
@@ -225,7 +231,7 @@ void drawFood()
 
 void initSnake()
 {
-	snake.length = 5;
+	snake.length = 2;
 	snake.headPositon.x = 200;
 	snake.headPositon.y = 120;
 	snake.color = C2D_Color32(0, 255, 0, 255);
@@ -352,10 +358,25 @@ void input()
 			game.status = RUNNING;
 		}
 	}
-	if(hidKeysUp() & KEY_B)
+	if(kDown & KEY_B)
 	{
 		if (game.status == PAUSED)
 		{
+			game.status = RUNNING;
+		}
+		else if (game.status == GAME_OVER)
+		{
+			game.status = EXIT;
+		}
+	}
+  if (kDown & KEY_A)
+  {
+		if (game.status == GAME_OVER)
+		{
+			saveHighscore();
+			game.score = 0;
+			initSnake();
+			spawnFood();
 			game.status = RUNNING;
 		}
 	}
@@ -420,15 +441,6 @@ int main(int argc, char* argv[]) {
 	{
 		if(game.status == EXIT)
 			break;
-
-		if(game.status == GAME_OVER)
-		{
-			saveHighscore();
-			game.score = 0;
-			initSnake();
-			spawnFood();
-			game.status = RUNNING;
-		}
 
 		input();
 		drawTopScreen();
